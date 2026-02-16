@@ -2,6 +2,9 @@
 
 This project is developed as part of the CodSoft Internship.
 
+## 🌍 Live Demo
+Frontend: https://desikart-codsoft-parul.netlify.app/
+
 ## Features
 - User Login & Signup
 - Product Categories
