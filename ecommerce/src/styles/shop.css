@@ -47,8 +47,11 @@ body {
 .products {
   flex: 3;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
+  .products {
+  grid-template-columns: 1fr;
+  gap: 15px;
+}
+
 }
 
 .card {
@@ -204,7 +207,7 @@ body {
   }
 
   .card img {
-    height: 310px;
+    height: 300px;
   }
 
   .card h3 {
