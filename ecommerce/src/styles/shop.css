@@ -4,7 +4,7 @@ body {
   background: #f5f5f5;
 }
 
-/* NAVBAR */
+
 .navbar {
   background: #0f172a;
   color: white;
@@ -36,14 +36,14 @@ body {
   font-weight: 600;
 }
 
-/* MAIN LAYOUT */
+
 .main {
   display: flex;
   padding: 20px;
   gap: 20px;
 }
 
-/* PRODUCTS */
+
 .products {
   flex: 3;
   display: grid;
@@ -87,7 +87,6 @@ body {
   cursor: pointer;
 }
 
-/* CART */
 .cart {
   flex: 1;
   background: white;
@@ -106,7 +105,7 @@ body {
   margin: 0 5px;
 }
 
-/* AUTH PAGES */
+
 .auth {
   max-width: 380px;
   margin: 80px auto;
@@ -154,3 +153,41 @@ body {
   cursor: pointer;
   font-weight: bold;
 }
+body {
+  margin: 0;
+  font-family: "Segoe UI", sans-serif;
+  background: #f5f5f5;
+  overflow-x: hidden;
+}
+
+@media (max-width: 768px) {
+
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .nav-links {
+    flex-wrap: wrap;
+  }
+
+  .main {
+    flex-direction: column;
+  }
+
+  .products {
+    grid-template-columns: 1fr;
+  }
+
+  .cart {
+    width: 100%;
+    margin-top: 20px;
+  }
+
+  .card img {
+    height: 250px;
+  }
+
+}
+
