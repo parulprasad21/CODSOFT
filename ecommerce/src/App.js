@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
+import axios from "axios";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Home from "./pages/Home";
@@ -11,43 +12,76 @@ function App() {
   const [showSignup, setShowSignup] = useState(false);
   const [cart, setCart] = useState([]);
 
-  const updateCart = (updatedCart) => {
-    setCart(updatedCart);
-  };
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (user && user.token) {
+      setIsLoggedIn(true);
+    } else {
+      localStorage.removeItem("user");
+      setIsLoggedIn(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const fetchCart = async () => {
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (!user || !user.token) return;
+
+      try {
+        const res = await axios.get(
+          "http://localhost:5000/api/cart",
+          {
+            headers: {
+              Authorization: `Bearer ${user.token}`
+            }
+          }
+        );
+        setCart(res.data.cartItems || []);
+      } catch (error) {
+        console.error("Cart load failed");
+      }
+    };
+
+    if (isLoggedIn) {
+      fetchCart();
+    }
+  }, [isLoggedIn]);
 
   if (!isLoggedIn) {
-    return showSignup
-      ? <Signup setShowSignup={setShowSignup} />
-      : <Login setIsLoggedIn={setIsLoggedIn} setShowSignup={setShowSignup} />;
+    return showSignup ? (
+      <Signup setShowSignup={setShowSignup} />
+    ) : (
+      <Login
+        setIsLoggedIn={setIsLoggedIn}
+        setShowSignup={setShowSignup}
+      />
+    );
   }
 
   return (
     <Routes>
-      {/* Home */}
       <Route
         path="/"
         element={
           <Home
             setIsLoggedIn={setIsLoggedIn}
             cart={cart}
-            updateCart={updateCart}
+            setCart={setCart}
           />
         }
       />
 
-      {/* Protected Checkout */}
       <Route
         path="/checkout"
         element={
           cart.length === 0 ? (
             <Navigate to="/" />
           ) : (
-            <Checkout cart={cart} updateCart={updateCart} />
+            <Checkout cart={cart} setCart={setCart} />
           )
         }
       />
 
-      {/* Redirect unknown routes */}
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );

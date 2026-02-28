@@ -1,12 +1,39 @@
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
-function Cart({ cart, updateQuantity }) {
+function Cart({ cart, setCart }) {
   const navigate = useNavigate();
+
+  const user = JSON.parse(localStorage.getItem("user"));
 
   const total = cart.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
   );
+
+  const updateQuantity = async (productId, change) => {
+    const updatedCart = cart.map(item =>
+      item.id === productId
+        ? { ...item, quantity: item.quantity + change }
+        : item
+    ).filter(item => item.quantity > 0);
+
+    setCart(updatedCart);
+
+    try {
+      await axios.post(
+        "http://localhost:5000/api/cart",
+        { cartItems: updatedCart },
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`
+          }
+        }
+      );
+    } catch (error) {
+      console.error("Cart update failed");
+    }
+  };
 
   return (
     <div className="cart">

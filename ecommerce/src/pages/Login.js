@@ -1,13 +1,27 @@
 import React, { useState } from "react";
+import axios from "axios";
 
 function Login({ setIsLoggedIn, setShowSignup }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
-    if (email === "test@desikart.com" && password === "123456") {
+  const handleLogin = async () => {
+    if (!email || !password) {
+      alert("Please fill all fields");
+      return;
+    }
+
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/auth/login",
+        { email, password }
+      );
+
+      // Save user in localStorage
+      localStorage.setItem("user", JSON.stringify(res.data));
+
       setIsLoggedIn(true);
-    } else {
+    } catch (error) {
       alert("Invalid email or password");
     }
   };
@@ -15,6 +29,7 @@ function Login({ setIsLoggedIn, setShowSignup }) {
   return (
     <div className="auth">
       <h2>Login to DESIKART</h2>
+
       <div className="form-group">
         <label>Email</label>
         <input
@@ -25,6 +40,7 @@ function Login({ setIsLoggedIn, setShowSignup }) {
           required
         />
       </div>
+
       <div className="form-group">
         <label>Password</label>
         <input
@@ -35,12 +51,17 @@ function Login({ setIsLoggedIn, setShowSignup }) {
           required
         />
       </div>
+
       <button className="btn-login" onClick={handleLogin}>
         Login
       </button>
+
       <p className="switch-auth">
         New user?{" "}
-        <span className="switch-link" onClick={() => setShowSignup(true)}>
+        <span
+          className="switch-link"
+          onClick={() => setShowSignup(true)}
+        >
           Create account
         </span>
       </p>

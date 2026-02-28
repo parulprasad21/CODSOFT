@@ -1,26 +1,78 @@
-import React from "react";
+import React, { useState } from "react";
+import axios from "axios";
 import Cart from "../components/Cart";
 
-function Checkout({ cart, updateCart }) {
+function Checkout({ cart, setCart }) {
+  const [loading, setLoading] = useState(false);
 
-  const updateQuantity = (id, change) => {
+  const updateQuantity = (_id, change) => {
     const updatedCart = cart
       .map((item) =>
-        item.id === id ? { ...item, quantity: item.quantity + change } : item
+        item._id === _id
+          ? { ...item, quantity: item.quantity + change }
+          : item
       )
       .filter((item) => item.quantity > 0);
 
-    updateCart(updatedCart);
+    setCart(updatedCart);
   };
 
-  // ✅ Calculate total here
   const total = cart.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
   );
 
-  const handlePayment = () => {
-    alert("Payment integration will be added later 😄");
+  const handlePlaceOrder = async () => {
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    if (!user || !user.token) {
+      alert("Please login first");
+      return;
+    }
+
+    if (cart.length === 0) {
+      alert("Cart is empty");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      // 1️⃣ Create Order
+      const { data } = await axios.post(
+        "http://localhost:5000/api/orders",
+        {
+          items: cart,
+          totalAmount: total,
+          shippingAddress: "Default Address"
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`
+          }
+        }
+      );
+
+      // 2️⃣ Simulate Payment Success
+      await axios.put(
+        `http://localhost:5000/api/orders/pay/${data._id}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`
+          }
+        }
+      );
+
+      alert("Order Placed Successfully!");
+      setCart([]);
+      setLoading(false);
+
+    } catch (error) {
+      console.error(error);
+      alert("Order failed");
+      setLoading(false);
+    }
   };
 
   return (
@@ -35,21 +87,19 @@ function Checkout({ cart, updateCart }) {
         </p>
       ) : (
         <div>
-
-          {/* Cart Items */}
           <Cart cart={cart} updateQuantity={updateQuantity} />
 
-          {/* Order Summary */}
-          <div style={{
-            marginTop: "20px",
-            padding: "15px",
-            background: "#f3f4f6",
-            borderRadius: "10px"
-          }}>
+          <div
+            style={{
+              marginTop: "20px",
+              padding: "15px",
+              background: "#f3f4f6",
+              borderRadius: "10px"
+            }}
+          >
             <h3>Total Amount: ₹{total}</h3>
           </div>
 
-          {/* Payment Button */}
           <button
             style={{
               marginTop: "20px",
@@ -62,11 +112,11 @@ function Checkout({ cart, updateCart }) {
               fontSize: "16px",
               width: "100%"
             }}
-            onClick={handlePayment}
+            onClick={handlePlaceOrder}
+            disabled={loading}
           >
-            Proceed to Payment
+            {loading ? "Placing Order..." : "Place Order"}
           </button>
-
         </div>
       )}
     </div>
