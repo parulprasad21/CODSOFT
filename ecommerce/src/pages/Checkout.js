@@ -38,7 +38,7 @@ function Checkout({ cart, setCart }) {
     try {
       setLoading(true);
 
-      // 1️⃣ Create Order
+      
       const { data } = await axios.post(
         "http://localhost:5000/api/orders",
         {
@@ -53,7 +53,7 @@ function Checkout({ cart, setCart }) {
         }
       );
 
-      // 2️⃣ Simulate Payment Success
+      
       await axios.put(
         `http://localhost:5000/api/orders/pay/${data._id}`,
         {},
@@ -64,7 +64,7 @@ function Checkout({ cart, setCart }) {
         }
       );
 
-      alert("Order Placed Successfully!");
+      alert("payment successful! Order Placed Successfully!");
       setCart([]);
       setLoading(false);
 
