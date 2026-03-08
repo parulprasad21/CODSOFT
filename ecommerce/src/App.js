@@ -29,7 +29,7 @@ function App() {
 
       try {
         const res = await axios.get(
-          "http://localhost:5000/api/cart",
+          "https://codsoft-2xsc.onrender.com/api/cart",
           {
             headers: {
               Authorization: `Bearer ${user.token}`

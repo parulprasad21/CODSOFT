@@ -22,7 +22,7 @@ function Cart({ cart, setCart }) {
 
     try {
       await axios.post(
-        "http://localhost:5000/api/cart",
+        "https://codsoft-2xsc.onrender.com/api/cart",
         { cartItems: updatedCart },
         {
           headers: {

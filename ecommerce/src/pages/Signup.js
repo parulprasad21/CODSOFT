@@ -14,7 +14,7 @@ function Signup({ setShowSignup }) {
 
     try {
       await axios.post(
-        "http://localhost:5000/api/auth/register",
+        "https://codsoft-2xsc.onrender.com/api/auth/register",
         {
           name: fullName,
           email,
