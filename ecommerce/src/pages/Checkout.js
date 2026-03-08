@@ -40,7 +40,7 @@ function Checkout({ cart, setCart }) {
 
       
       const { data } = await axios.post(
-        "http://localhost:5000/api/orders",
+        "https://desikart-codsoft-parul.netlify.app/api/orders",
         {
           items: cart,
           totalAmount: total,
