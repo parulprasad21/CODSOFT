@@ -4,23 +4,19 @@ import Cart from "../components/Cart";
 
 function Checkout({ cart, setCart }) {
   const [loading, setLoading] = useState(false);
+  const API_URL = "https://codsoft-2xsc.onrender.com/api";
 
   const updateQuantity = (_id, change) => {
     const updatedCart = cart
       .map((item) =>
-        item._id === _id
-          ? { ...item, quantity: item.quantity + change }
-          : item
+        item._id === _id ? { ...item, quantity: item.quantity + change } : item
       )
       .filter((item) => item.quantity > 0);
 
     setCart(updatedCart);
   };
 
-  const total = cart.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
+  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   const handlePlaceOrder = async () => {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -38,53 +34,47 @@ function Checkout({ cart, setCart }) {
     try {
       setLoading(true);
 
-      
-      const { data } = await axios.post(
-        "https://desikart-codsoft-parul.netlify.app/api/orders",
+      const { data: order } = await axios.post(
+        `${API_URL}/orders`,
         {
           items: cart,
           totalAmount: total,
-          shippingAddress: "Default Address"
+          shippingAddress: "Default Address",
         },
         {
-          headers: {
-            Authorization: `Bearer ${user.token}`
-          }
+          headers: { Authorization: `Bearer ${user.token}` },
         }
       );
 
-      
       await axios.put(
-        `http://localhost:5000/api/orders/pay/${data._id}`,
+        `${API_URL}/orders/pay/${order._id}`,
         {},
         {
-          headers: {
-            Authorization: `Bearer ${user.token}`
-          }
+          headers: { Authorization: `Bearer ${user.token}` },
         }
       );
 
-      alert("payment successful! Order Placed Successfully!");
+      alert("Order placed successfully! Pay on delivery, thank you for shopping with us.");
       setCart([]);
-      setLoading(false);
-
     } catch (error) {
-      console.error(error);
-      alert("Order failed");
+      console.error(
+        error.response ? error.response.data : error.message
+      );
+      alert(
+        "Order failed: " +
+          (error.response?.data?.message || error.message || "Unknown error")
+      );
+    } finally {
       setLoading(false);
     }
   };
 
   return (
     <div style={{ padding: "30px" }}>
-      <h2 style={{ textAlign: "center", marginBottom: "20px" }}>
-        Checkout
-      </h2>
+      <h2 style={{ textAlign: "center", marginBottom: "20px" }}>Checkout</h2>
 
       {cart.length === 0 ? (
-        <p style={{ textAlign: "center" }}>
-          Your cart is empty.
-        </p>
+        <p style={{ textAlign: "center" }}>Your cart is empty.</p>
       ) : (
         <div>
           <Cart cart={cart} updateQuantity={updateQuantity} />
@@ -94,7 +84,7 @@ function Checkout({ cart, setCart }) {
               marginTop: "20px",
               padding: "15px",
               background: "#f3f4f6",
-              borderRadius: "10px"
+              borderRadius: "10px",
             }}
           >
             <h3>Total Amount: ₹{total}</h3>
@@ -110,7 +100,7 @@ function Checkout({ cart, setCart }) {
               borderRadius: "8px",
               cursor: "pointer",
               fontSize: "16px",
-              width: "100%"
+              width: "100%",
             }}
             onClick={handlePlaceOrder}
             disabled={loading}
